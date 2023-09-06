@@ -13,14 +13,14 @@ router.post('/add_user', upload.single('file'), async (req, res) => {
   try {
     const { name, email } = req.body;
     const uploadedFile = req.file;
-    console.log('Uploaded file is', uploadedFile);
+    console.log('Uploaded file BUFFFFFFFFFFFFER is', uploadedFile);
     // Create a new user instance
     const newUser = new User({
       name,
       email,
       file: {
         filename: uploadedFile.originalname.toString(),
-        data: uploadedFile.buffer,
+        data: uploadedFile.path,
         contentType: uploadedFile.mimetype,
       }, // Store the file name in MongoDB
     });
