@@ -30,13 +30,29 @@ db.once('open', () => {
   console.log('Server is running and Connected to MongoDB');
 });
 // Define the directory to store uploaded files
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'uploads/'); // Change the directory as needed
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, file.originalname);
+//   },
+// });
+// Set up multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Change the directory as needed
+    cb(null, 'uploads/'); // Destination folder for storing uploaded files
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + file.originalname); // File naming strategy
   },
 });
+const upload = multer({ storage: storage });
 
-const upload = multer({ storage });
+app.get('/users', async (req, res) => {
+  let collection = await db.collection('users');
+  let results = await collection.find({}).limit(50).toArray();
+
+  res.send(results).status(200);
+});
