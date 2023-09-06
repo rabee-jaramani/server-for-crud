@@ -5,6 +5,8 @@ const { MongoClient } = require('mongodb');
 const bodyParser = require('body-parser');
 const usersRouter = require('./routes/users');
 var cors = require('cors');
+const gridfs = require('gridfs-stream');
+
 const app = express();
 const multer = require('multer');
 app.use(cors());
@@ -25,9 +27,12 @@ mongoose.connect(
   }
 );
 const db = mongoose.connection;
+let gfs;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => {
   console.log('Server is running and Connected to MongoDB');
+  gfs = gridfs(db.db, mongoose.mongo);
+  //   console.log('gfs', gfs);
 });
 // Define the directory to store uploaded files
 // const storage = multer.diskStorage({
@@ -55,4 +60,31 @@ app.get('/users', async (req, res) => {
   let results = await collection.find({}).limit(50).toArray();
 
   res.send(results).status(200);
+});
+app.get('/users/:filename', (req, res) => {
+  const { filename } = req.params;
+
+  if (!gfs) {
+    return res.status(500).json({ error: 'GridFS stream is not configured' });
+  }
+
+  // Find the file by its filename in GridFS
+  gfs.files.findOne({ filename }, (err, file) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error finding file in GridFS' });
+    }
+
+    if (!file) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    // Create a read stream from GridFS
+    const readStream = gfs.createReadStream({ filename });
+
+    // Set the appropriate Content-Type header for the file
+    res.set('Content-Type', file.contentType);
+
+    // Pipe the read stream to the response
+    readStream.pipe(res);
+  });
 });
