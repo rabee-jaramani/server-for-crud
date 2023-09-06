@@ -61,30 +61,32 @@ app.get('/users', async (req, res) => {
 
   res.send(results).status(200);
 });
-app.get('/users/:filename', (req, res) => {
+app.get('/users/:filename', async (req, res) => {
   const { filename } = req.params;
 
   if (!gfs) {
     return res.status(500).json({ error: 'GridFS stream is not configured' });
   }
-
+  const file = await gfs.files.findOne({ filename });
+  console.log('AAAAAAAAAAAAAAA', file);
+  console.log('GGGGGGGGGG', gfs.files);
   // Find the file by its filename in GridFS
-  gfs.files.findOne({ filename }, (err, file) => {
-    if (err) {
-      return res.status(500).json({ error: 'Error finding file in GridFS' });
-    }
+  //   gfs.files.findOne({ filename }, (err, file) => {
+  //     if (err) {
+  //       return res.status(500).json({ error: 'Error finding file in GridFS' });
+  //     }
 
-    if (!file) {
-      return res.status(404).json({ error: 'File not found' });
-    }
+  //     if (!file) {
+  //       return res.status(404).json({ error: 'File not found' });
+  //     }
 
-    // Create a read stream from GridFS
-    const readStream = gfs.createReadStream({ filename });
+  //     // Create a read stream from GridFS
+  //     const readStream = gfs.createReadStream({ filename });
 
-    // Set the appropriate Content-Type header for the file
-    res.set('Content-Type', file.contentType);
+  //     // Set the appropriate Content-Type header for the file
+  //     res.set('Content-Type', file.contentType);
 
-    // Pipe the read stream to the response
-    readStream.pipe(res);
-  });
+  //     // Pipe the read stream to the response
+  //     readStream.pipe(res);
+  //   });
 });
