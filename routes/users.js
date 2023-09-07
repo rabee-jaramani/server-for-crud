@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/user');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
+const fs = require("fs");
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
 // POST route to insert a new user record
@@ -12,20 +13,18 @@ router.post('/add_user', upload.single('file'), async (req, res) => {
   }
   try {
     const { name, email } = req.body;
-    const uploadedFile = req.file;
-    console.log('Uploaded file BUFFFFFFFFFFFFER is', uploadedFile);
-    // Create a new user instance
+    var img = fs.readFileSync(req.file.path);
+    // var encode_img = img.toString('base64');
+    var final_img = {
+      filename: req.file.originalname,
+      data: img,
+      contentType: req.file.mimetype,
+    };
     const newUser = new User({
       name,
       email,
-      file: {
-        filename: uploadedFile.originalname.toString(),
-        data: uploadedFile.path,
-        contentType: uploadedFile.mimetype,
-      }, // Store the file name in MongoDB
+      file: final_img
     });
-
-    // Save the user to the database
     await newUser.save();
 
     res.status(201).json(newUser);
@@ -45,4 +44,33 @@ router.get('/get_users', async (req, res) => {
   }
 });
 
+router.post('/upload', upload.single('file'), (req, res) => {
+  const { originalname, mimetype, buffer } = req.file;
+
+  const writestream = gfs.createWriteStream({
+    filename: originalname,
+    contentType: mimetype,
+  });
+
+  writestream.on('close', (file) => {
+    const newFile = new File({
+      filename: file.filename,
+      contentType: file.contentType,
+      length: file.length,
+      uploadDate: file.uploadDate,
+    });
+
+    newFile.save((err) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('File upload failed.');
+      } else {
+        res.status(201).json({ message: 'File uploaded successfully.' });
+      }
+    });
+  });
+
+  writestream.write(buffer);
+  writestream.end();
+});
 module.exports = router;

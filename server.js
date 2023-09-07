@@ -1,7 +1,7 @@
 // Import required modules
 const express = require('express');
 const mongoose = require('mongoose');
-const { MongoClient } = require('mongodb');
+const { MongoClient, GridFSBucket } = require('mongodb');
 const bodyParser = require('body-parser');
 const usersRouter = require('./routes/users');
 var cors = require('cors');
@@ -11,6 +11,10 @@ const app = express();
 const multer = require('multer');
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded(
+  { extended: true }
+))
+
 app.use('/users', usersRouter);
 const port = process.env.PORT || 5000;
 app.get('/', (req, res) => {
@@ -27,11 +31,10 @@ mongoose.connect(
   }
 );
 const db = mongoose.connection;
-let gfs;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => {
   console.log('Server is running and Connected to MongoDB');
-  gfs = gridfs(db.db, mongoose.mongo);
+  var gfs = gridfs(db.db, mongoose.mongo);
   //   console.log('gfs', gfs);
 });
 // Define the directory to store uploaded files
@@ -57,7 +60,7 @@ const upload = multer({ storage: storage });
 
 app.get('/users', async (req, res) => {
   let collection = await db.collection('users');
-  let results = await collection.find({}).limit(50).toArray();
+  let results = await collection.find({}).toArray();
 
   res.send(results).status(200);
 });
@@ -70,23 +73,30 @@ app.get('/users/:filename', async (req, res) => {
   const file = await gfs.files.findOne({ filename });
   console.log('AAAAAAAAAAAAAAA', file);
   console.log('GGGGGGGGGG', gfs.files);
-  // Find the file by its filename in GridFS
-  //   gfs.files.findOne({ filename }, (err, file) => {
-  //     if (err) {
-  //       return res.status(500).json({ error: 'Error finding file in GridFS' });
-  //     }
+});
+app.get('/download/:filename', async (req, res) => {
+  // res.send("dedededed")
+  try {
+    // console.log(filename)
 
-  //     if (!file) {
-  //       return res.status(404).json({ error: 'File not found' });
-  //     }
+    const client = new MongoClient('mongodb+srv://cruduser:cruduser123@clustercrud.ajooqoh.mongodb.net/?retryWrites=true&w=majority');
+    await client.connect();
 
-  //     // Create a read stream from GridFS
-  //     const readStream = gfs.createReadStream({ filename });
+    // const db = client.db(dbName);
+    const bucket = new GridFSBucket(db);
+    // console.log('dbbbbbbbbb', db)
+    const filename = req.params.filename;
+    const downloadStream = bucket.openDownloadStream(filename);
 
-  //     // Set the appropriate Content-Type header for the file
-  //     res.set('Content-Type', file.contentType);
+    res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+    res.setHeader('Content-Type', 'application/octet-stream');
+    downloadStream.pipe(res);
 
-  //     // Pipe the read stream to the response
-  //     readStream.pipe(res);
-  //   });
+    downloadStream.on('end', () => {
+      client.close();
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
 });
