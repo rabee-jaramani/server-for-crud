@@ -2,7 +2,7 @@
 const express = require('express');
 // const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const usersRouter = require('./routes/users');
+// const usersRouter = require('./routes/users');
 var cors = require('cors');
 const app = express();
 // const multer = require('multer');
@@ -10,7 +10,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/users', usersRouter);
+// app.use('/users', usersRouter);
 const port = process.env.PORT || 5000;
 // mongoose.connect(
 //   'mongodb+srv://cruduser:cruduser123@clustercrud.ajooqoh.mongodb.net/?retryWrites=true&w=majority',
@@ -36,11 +36,11 @@ const port = process.env.PORT || 5000;
 // });
 // const upload = multer({ storage: storage });
 
-app.get('/users', async (req, res) => {
-  let collection = await db.collection('users');
-  let results = await collection.find({}).toArray();
-  res.send(results).status(200);
-});
+// app.get('/users', async (req, res) => {
+//   let collection = await db.collection('users');
+//   let results = await collection.find({}).toArray();
+//   res.send(results).status(200);
+// });
 app.get('/', (req, res) => {
   res.send('Hello, CRUD SERVERDKKKKKKKKKKDDD!');
 });
