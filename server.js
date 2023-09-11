@@ -1,5 +1,6 @@
 // Import required modules
 const express = require('express');
+require('dotenv').config();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 // const usersRouter = require('./routes/users');
@@ -9,16 +10,13 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+const uri = process.env.MONGODB_URI;
 // app.use('/users', usersRouter);
 const port = process.env.PORT || 5000;
-mongoose.connect(
-  'mongodb+srv://cruduser:cruduser123@clustercrud.ajooqoh.mongodb.net/?retryWrites=true&w=majority',
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 // const db = mongoose.connection;
 // db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 // db.once('open', () => {
