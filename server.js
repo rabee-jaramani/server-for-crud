@@ -8,9 +8,7 @@ const app = express();
 const multer = require('multer');
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded(
-  { extended: true }
-))
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/users', usersRouter);
 const port = process.env.PORT || 5000;
@@ -20,18 +18,18 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-mongoose.connect(
-  'mongodb+srv://cruduser:cruduser123@clustercrud.ajooqoh.mongodb.net/?retryWrites=true&w=majority',
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
-  console.log('Server is running and Connected to MongoDB');
-});
+// mongoose.connect(
+//   'mongodb+srv://cruduser:cruduser123@clustercrud.ajooqoh.mongodb.net/?retryWrites=true&w=majority',
+//   {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   }
+// );
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+// db.once('open', () => {
+//   console.log('Server is running and Connected to MongoDB');
+// });
 // Set up multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
