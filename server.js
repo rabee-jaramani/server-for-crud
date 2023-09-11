@@ -1,6 +1,6 @@
 // Import required modules
 const express = require('express');
-// const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 // const usersRouter = require('./routes/users');
 var cors = require('cors');
@@ -12,13 +12,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // app.use('/users', usersRouter);
 const port = process.env.PORT || 5000;
-// mongoose.connect(
-//   'mongodb+srv://cruduser:cruduser123@clustercrud.ajooqoh.mongodb.net/?retryWrites=true&w=majority',
-//   {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   }
-// );
+mongoose.connect(
+  'mongodb+srv://cruduser:cruduser123@clustercrud.ajooqoh.mongodb.net/?retryWrites=true&w=majority',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 // const db = mongoose.connection;
 // db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 // db.once('open', () => {
