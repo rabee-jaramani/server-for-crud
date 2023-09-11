@@ -3,9 +3,7 @@ const router = express.Router();
 const User = require('../models/user');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
-const fs = require("fs");
-const mongoose = require('mongoose');
-const Grid = require('gridfs-stream');
+const fs = require('fs');
 // POST route to insert a new user record
 router.post('/add_user', upload.single('file'), async (req, res) => {
   if (!req.file) {
@@ -23,7 +21,7 @@ router.post('/add_user', upload.single('file'), async (req, res) => {
     const newUser = new User({
       name,
       email,
-      file: final_img
+      file: final_img,
     });
     await newUser.save();
 
