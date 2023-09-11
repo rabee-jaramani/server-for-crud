@@ -1,6 +1,6 @@
 // Import required modules
 const express = require('express');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 // const usersRouter = require('./routes/users');
 var cors = require('cors');
