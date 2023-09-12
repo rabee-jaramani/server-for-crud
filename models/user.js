@@ -3,7 +3,16 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
   name: String,
   email: String,
-  file: {
+  phone: String,
+  checkboxes: JSON,
+  dropdown: String,
+  radio: String,
+  file1: {
+    filename: String,
+    data: Buffer,
+    contentType: String,
+  },
+  file2: {
     filename: String,
     data: Buffer,
     contentType: String,
